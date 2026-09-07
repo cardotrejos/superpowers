@@ -1,120 +1,48 @@
 ---
 name: verification-before-completion
-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+description: Check that completion, fix, build, or test claims are supported by evidence from the relevant code and environment before reporting success or publishing the work.
 ---
 
 # Verification Before Completion
 
-## Overview
+Make claims no broader than the evidence. Use the smallest relevant verification that proves the changed behavior and complete repository-required checks.
 
-**Core principle:** Evidence before claims, always.
+## Evidence Validity
 
-**Violating the letter of this rule is violating the spirit of this rule.**
+Reuse current evidence until the relevant code, configuration, environment, target, or claim changes. A new message does not invalidate a completed check. Re-run when a later edit could affect the result, when live state may have drifted, or when the previous run did not cover the claim.
 
-## The Iron Law
+Track the command or interaction, target revision or artifact, relevant environment, result, and limitations. A passing check on another build or environment does not prove this one works.
 
-```
-NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
-```
+## Before a Completion Claim
 
-If you haven't run the verification command in this message, you cannot claim it passes.
+1. Identify the observable result that would support the claim.
+2. Inspect the recorded evidence and decide whether it still applies.
+3. Run missing or invalidated checks; read the relevant output and exit status.
+4. Compare the result with the requested outcome, including requirements a test suite does not cover.
+5. Report the actual state and any material verification gap.
 
-## The Gate Function
+## Match Evidence to the Claim
 
-```
-BEFORE claiming any status or expressing satisfaction:
+| Claim | Relevant evidence | Insufficient by itself |
+|-------|-------------------|------------------------|
+| Tests pass | Relevant test output with no failures on the current code | An expectation that they should pass |
+| Linter is clean | Linter result covering the changed files or required scope | A check on unrelated files |
+| Build succeeds | Successful build of the relevant target | Linter output |
+| Bug is fixed | Original symptom or meaningful regression reproduction now passes | An edit that looks plausible |
+| Regression test detects the bug | Failure on an affected baseline and success after the fix, or equivalent recorded evidence | A test that only mirrors implementation |
+| Requested work is complete | Reviewed changes and acceptance evidence for the requested outcome | Agent self-report or tests alone |
+| Production is healthy | Current evidence from the affected live target | Local compilation or a successful upload |
 
-1. IDENTIFY: What command proves this claim?
-2. RUN: Execute the FULL command (fresh, complete)
-3. READ: Full output, check exit code, count failures
-4. VERIFY: Does output confirm the claim?
-   - If NO: State actual status with evidence
-   - If YES: State claim WITH evidence
-5. ONLY THEN: Make the claim
+A focused check supports a focused claim. It need not prove the entire product correct.
 
-Skip any step = lying, not verifying
-```
+## Regression Evidence
 
-## Common Failures
+Prefer capturing a failure before implementing a testable fix. If the implementation is already present and the failure was not recorded, use a safe isolated baseline when needed. Preserve user work and never revert a shared worktree merely to demonstrate test order. Reuse recorded before/after evidence instead of repeating a fail/fix cycle for every report.
 
-| Claim | Requires | Not Sufficient |
-|-------|----------|----------------|
-| Tests pass | Test command output: 0 failures | Previous run, "should pass" |
-| Linter clean | Linter output: 0 errors | Partial check, extrapolation |
-| Build succeeds | Build command: exit 0 | Linter passing, logs look good |
-| Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
-| Regression test works | Red-green cycle verified | Test passes once |
-| Agent completed | VCS diff shows changes | Agent reports "success" |
-| Requirements met | Line-by-line checklist | Tests passing |
+## Delegated Work
 
-## Red Flags - STOP
+Review the delivered diff or artifact and the worker's evidence. Re-run checks when results are missing, ambiguous, stale, or do not cover integration with other changes. Do not repeat a valid check solely because another agent ran it.
 
-- Using "should", "probably", "seems to"
-- Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to commit/push/PR without verification
-- Trusting agent success reports
-- Relying on partial verification
-- Thinking "just this once"
-- Tired and wanting work over
-- **ANY wording implying success without having run verification**
+## Reporting
 
-## Rationalization Prevention
-
-| Excuse | Reality |
-|--------|---------|
-| "Should work now" | RUN the verification |
-| "I'm confident" | Confidence ≠ evidence |
-| "Just this once" | No exceptions |
-| "Linter passed" | Linter ≠ compiler |
-| "Agent said success" | Verify independently |
-| "I'm tired" | Exhaustion ≠ excuse |
-| "Partial check is enough" | Partial proves nothing |
-| "Different words so rule doesn't apply" | Spirit over letter |
-
-## Key Patterns
-
-**Tests:**
-```
-✅ [Run test command] [See: 34/34 pass] "All tests pass"
-❌ "Should pass now" / "Looks correct"
-```
-
-**Regression tests (TDD Red-Green):**
-```
-✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
-❌ "I've written a regression test" (without red-green verification)
-```
-
-**Build:**
-```
-✅ [Run build] [See: exit 0] "Build passes"
-❌ "Linter passed" (linter doesn't check compilation)
-```
-
-**Requirements:**
-```
-✅ Re-read plan → Create checklist → Verify each → Report gaps or completion
-❌ "Tests pass, phase complete"
-```
-
-**Agent delegation:**
-```
-✅ Agent reports success → Check VCS diff → Verify changes → Report actual state
-❌ Trust agent report
-```
-
-## When To Apply
-
-**ALWAYS before:**
-- ANY variation of success/completion claims
-- ANY expression of satisfaction
-- ANY positive statement about work state
-- Committing, PR creation, task completion
-- Moving to next task
-- Delegating to agents
-
-**Rule applies to:**
-- Exact phrases
-- Paraphrases and synonyms
-- Implications of success
-- ANY communication suggesting completion/correctness
+State what changed, what was verified, and unresolved failures or limitations. Distinguish a baseline failure from a regression introduced by the change. If a required check cannot run, report that limit and do not convert it into a passing result.

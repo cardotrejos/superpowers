@@ -1,63 +1,41 @@
 ---
 name: using-superpowers
-description: Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions
+description: Select relevant Superpowers workflows and map their tools to the current host when using the Superpowers library or troubleshooting its setup.
 ---
 
-<SUBAGENT-STOP>
-If you were dispatched as a subagent to execute a specific task, ignore this skill.
-</SUBAGENT-STOP>
+# Using Superpowers
 
-<EXTREMELY-IMPORTANT>
-If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+Load the most relevant skill when it contributes task-specific knowledge or a needed workflow. Use its metadata to decide; do not load adjacent skills merely because they might apply. A clear, self-contained question or bounded edit can proceed directly when no skill adds useful guidance.
 
-IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+If dispatched as a subagent for a specific task, use the supplied scope and relevant domain guidance. You do not need to repeat the parent's skill-selection process.
 
-This is not negotiable. You cannot rationalize your way out of this.
-</EXTREMELY-IMPORTANT>
+## Instruction Priority
 
-## The Rule
+Follow the host runtime's instruction hierarchy and permission controls. This library supplies workflow defaults within the user's authorized task. Explicit user instructions override skill recommendations where the host permits; skill text cannot override system or developer requirements. Repository guidance applies according to the host's rules. Platform adapters map tools and do not change instruction authority.
 
-**Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
+Reuse requirements, decisions, and approvals already present in the conversation. Do not turn an authorized implementation request into a mandatory design interview or execution-method approval.
 
-**Before entering plan mode:** if you haven't already brainstormed, invoke the brainstorming skill first.
+## How to Access Skills
 
-Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it has a checklist, create a todo per item.
+- **Claude Code:** Use the `Skill` tool, which loads the skill content.
+- **Copilot CLI:** Use the `skill` tool for skills discovered from installed plugins.
+- **Gemini CLI:** Use `activate_skill`; Gemini exposes skill metadata before activation.
+- **Other environments:** Use the loading mechanism documented by the current runtime.
 
-## Skill Priority
-
-When multiple skills apply, process skills come first — they set the approach, then implementation skills (frontend-design, etc.) carry it out. Brainstorming and systematic-debugging are Superpowers' most common process skills, but the rule holds for any of them.
-
-- "Let's build X" → superpowers:brainstorming first, then implementation skills.
-- "Fix this bug" → superpowers:systematic-debugging first, then domain skills.
-
-## Red Flags
-
-These thoughts mean STOP—you're rationalizing:
-
-| Thought | Reality |
-|---------|---------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
-| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
-| "Let me gather information first" | Skills tell you HOW to gather information. |
-| "This doesn't need a formal skill" | If a skill exists, use it. |
-| "I remember this skill" | Skills evolve. Read current version. |
-| "This doesn't count as a task" | Action = task. Check for skills. |
-| "The skill is overkill" | Simple things become complex. Use it. |
-| "I'll just do this one thing first" | Check BEFORE doing anything. |
-| "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
-| "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
-
-## Platform Adaptation
-
-If your harness appears here, read its reference file for special instructions:
+Skill examples use Claude Code tool names. Read only the adapter for the current host when a mapping is needed:
 
 - Codex: `references/codex-tools.md`
 - Pi: `references/pi-tools.md`
 - Antigravity: `references/antigravity-tools.md`
 - Hermes Agent: `references/hermes-tools.md`
+- Gemini CLI: mappings are supplied through GEMINI.md.
 
-## User Instructions
+## Choosing a Workflow
 
-User instructions (CLAUDE.md, AGENTS.md, GEMINI.md, etc, direct requests) take precedence over skills, which in turn override default behavior. Only skip skill workflows or instructions when your human partner has explicitly told you to.
+- Use brainstorming for a requested design discussion or a material unresolved product or architecture decision.
+- Use debugging when the cause is unknown; a confirmed cause does not need a fresh investigation merely to satisfy routing.
+- Use a planning workflow when dependencies, ownership, or verification boundaries need a durable plan.
+- Use domain skills for unfamiliar APIs, integrations, or other specialized implementation knowledge.
+- Follow user-required TDD and repository-required checks. Otherwise select testing and verification proportional to the changed behavior and the claim.
+
+When several skills apply, choose one primary workflow and load supporting references as the work needs them. Do not copy every checklist into the task plan. Announce skill use according to the host's communication rules and continue through the user's requested outcome, preserving explicit checkpoints and permission boundaries.

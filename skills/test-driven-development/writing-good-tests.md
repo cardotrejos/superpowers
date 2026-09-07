@@ -149,8 +149,10 @@ BEFORE adding a mock or test helper:
 
 ## Tests Ship With the Implementation
 
-The TDD cycle — failing test, minimal implementation, refactor — is what
-"complete" means. Ship the tests the behavior needs and only those:
+Completion means the requested behavior is supported by relevant evidence.
+Use the failing-test, implementation, refactor cycle when TDD applies.
+Preserve existing implementation and obtain regression evidence without
+deleting work to enforce test order. Ship the tests the behavior needs and only those:
 trivial code and human prose earn none, and a test written to satisfy
 process costs maintenance forever.
 
